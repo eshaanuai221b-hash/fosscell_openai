@@ -1,0 +1,176 @@
+def matrix_squeezer(board, folds):
+    vowels = set("aeiouAEIOU")
+
+    # Convert every character into a pile
+    board = [
+        [[char] for char in row]
+        for row in board
+    ]
+
+    def interact(pile):
+        """
+        Resolve interactions inside one pile.
+        """
+        changed = True
+
+        while changed:
+            changed = False
+            new_pile = []
+            i = 0
+
+            while i < len(pile):
+                if i + 1 < len(pile):
+                    a = pile[i]
+                    b = pile[i + 1]
+
+                    # Vowel + consonant -> both disappear
+                    if ((a.lower() in vowels) !=
+                            (b.lower() in vowels)):
+
+                        i += 2
+                        changed = True
+                        continue
+
+                    # Same letters -> fuse into uppercase
+                    if a.lower() == b.lower():
+                        new_pile.append(a.upper())
+                        i += 2
+                        changed = True
+                        continue
+
+                new_pile.append(pile[i])
+                i += 1
+
+            pile = new_pile
+
+        return pile
+
+    def merge(target, moving):
+        """
+        moving pile lands on target pile.
+        """
+        # Physical flip turns the entire pile upside down
+        moving = moving[::-1]
+
+        target.extend(moving)
+
+        return interact(target)
+
+    for direction in folds:
+
+        rows = len(board)
+        cols = len(board[0])
+
+        if direction == "left":
+            new_cols = (cols + 1) // 2
+            new_board = [[[] for _ in range(new_cols)]
+                         for _ in range(rows)]
+
+            for r in range(rows):
+                for c in range(cols):
+
+                    # Left side stays where it is
+                    if c < new_cols:
+                        new_board[r][c] = board[r][c].copy()
+
+            # Right side folds onto the left
+            for r in range(rows):
+                for c in range(cols // 2):
+                    source = cols - 1 - c
+                    target = c
+
+                    new_board[r][target] = merge(
+                        new_board[r][target],
+                        board[r][source]
+                    )
+
+            board = new_board
+
+        elif direction == "right":
+            new_cols = (cols + 1) // 2
+            new_board = [[[] for _ in range(new_cols)]
+                         for _ in range(rows)]
+
+            # Right side stays
+            offset = cols - new_cols
+
+            for r in range(rows):
+                for c in range(new_cols):
+                    new_board[r][c] = board[r][offset + c].copy()
+
+            # Left side folds onto right
+            for r in range(rows):
+                for c in range(cols // 2):
+                    source = c
+                    target = new_cols - 1 - c
+
+                    new_board[r][target] = merge(
+                        new_board[r][target],
+                        board[r][source]
+                    )
+
+            board = new_board
+
+        elif direction == "up":
+            new_rows = (rows + 1) // 2
+            new_board = [[[] for _ in range(cols)]
+                         for _ in range(new_rows)]
+
+            # Top half stays
+            for r in range(new_rows):
+                for c in range(cols):
+                    new_board[r][c] = board[r][c].copy()
+
+            # Bottom folds upward
+            for r in range(rows // 2):
+                source = rows - 1 - r
+                target = r
+
+                for c in range(cols):
+                    new_board[target][c] = merge(
+                        new_board[target][c],
+                        board[source][c]
+                    )
+
+            board = new_board
+
+        elif direction == "down":
+            new_rows = (rows + 1) // 2
+            new_board = [[[] for _ in range(cols)]
+                         for _ in range(new_rows)]
+
+            # Bottom half stays
+            offset = rows - new_rows
+
+            for r in range(new_rows):
+                for c in range(cols):
+                    new_board[r][c] = board[offset + r][c].copy()
+
+            # Top folds downward
+            for r in range(rows // 2):
+                source = r
+                target = new_rows - 1 - r
+
+                for c in range(cols):
+                    new_board[target][c] = merge(
+                        new_board[target][c],
+                        board[source][c]
+                    )
+
+            board = new_board
+
+    # Final top view
+    result = []
+
+    for row in board:
+        result_row = []
+
+        for pile in row:
+            if pile:
+                result_row.append("".join(pile))
+            else:
+                result_row.append("_")
+
+        result.append(result_row)
+
+    return result
