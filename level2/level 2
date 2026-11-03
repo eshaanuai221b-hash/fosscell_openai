@@ -1,0 +1,24 @@
+Overview of the Code
+What it does
+
+This is a small C program that implements QuickSort and runs it on a hardcoded array of 10 integers (10, 7, 8, 9, 1, 5, 2, 3, 4, 6). It prints the array before and after sorting, so the expected output is 1 2 3 4 5 6 7 8 9 10.
+
+How it’s structured
+SwapElements swaps two integers through pointers.
+partition_array uses the Lomuto partition scheme: it picks the last element as the pivot, moves smaller elements to the left, and places the pivot in its final position.
+QuickSort recursively sorts the left and right sides of the pivot.
+printArray prints the array contents on one line.
+main allocates memory with malloc, fills it with test values, sorts, and prints.
+The “Level 2 debugging” task
+
+The comments frame this as a code-cleanup exercise. The issues planted in it are:
+
+Inconsistent naming: SwapElements and QuickSort are CamelCase, partition_array is snake_case, and printArray is camelCase. They should all use one convention (e.g. snake_case: swap_elements, quick_sort, partition_array, print_array).
+Memory leak: data is allocated with malloc but never freed.
+Missing error handling: the return value of malloc is never checked for NULL, so a failed allocation would cause undefined behavior.
+Unused includes and macros: <time.h> and MAX_SIZE are never used.
+Magic numbers: 10 and 9 are hardcoded in several places instead of using a named size constant.
+Minor style issues: the unnecessary (int *) cast on malloc (not needed in C), main() should be main(void), the redundant parentheses in int i = (low - 1), and multiple assignments crammed on one line.
+Overall assessment
+
+The sorting logic itself is correct. There are no algorithmic bugs, and the code would produce the right output. The problems are about code quality, consistency, and resource management, not correctness. The one real runtime concern is the memory leak (harmless in a short program, but bad practice), along with the unchecked malloc.
