@@ -1,0 +1,58 @@
+What the program does
+Analyzes a large server request log file.
+Converts raw request data into a performance summary report.
+Mainly designed to process large amounts of data efficiently.
+Input
+Reads data from requests.log.
+Each request contains:
+Timestamp
+HTTP method
+Endpoint/API path
+HTTP status code
+Response latency
+What it analyzes
+Groups requests by:
+Hour
+Endpoint
+Calculates:
+Total number of requests
+P50 latency — typical/median response time
+P95 latency — response time for 95% of requests
+P99 latency — response time for 99% of requests
+Number of 5xx server errors
+Error rate
+How it handles large files
+Doesn't load the entire log into memory at once.
+Reads the file in chunks.
+Splits the work into different sections.
+Uses multiple CPU processes when appropriate.
+Combines the results from different processes.
+Performance optimization
+Uses optimized data structures and algorithms.
+Detects available CPU resources.
+Can use CPU/cgroup limits to determine how much processing is safe.
+Uses os.pread() for efficient file reading.
+Uses optimized methods for calculating percentiles.
+Can use posix_fadvise() when available to improve file-access behavior.
+Error handling
+Checks whether timestamps and log entries are valid.
+Detects malformed lines.
+Has multiple processing paths.
+If the highly optimized method fails, it can fall back to simpler processing.
+Output
+Creates summary.txt.
+The summary contains information such as:
+Hour
+Endpoint
+Request count
+P50
+P95
+P99
+5xx errors
+Error rate
+Overall structure
+
+requests.log → Read → Parse → Group → Analyze → Calculate statistics → Combine results → summary.txt
+
+In one sentence
+It is a high-performance Python server-log analyzer that turns huge amounts of raw request data into useful performance and error statistics.
